@@ -112,7 +112,7 @@ For this session we'll be using a prepackaged Docker image as covering the proce
 
 * Issue the `docker run` command to start the web front end
 
-        docker run -d -p 80:80 --name web mikegcoleman/todo
+        docker run -d -p 80:80 --name web mikegcoleman/todo:reinvent
         
     * *-d*  starts the container in the background (detached mode)
     * *-p* insructs Docker to route any connections coming into the Lightsail instance on port 80 to be routed to the docker container on the same port
