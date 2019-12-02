@@ -199,13 +199,21 @@ The other way to handle the issue is to instruct Docker to remap the file from t
 
         docker rm web
 
-* Create a local copy of the configuration file
+* Create a local copy of the configuration file by cloning down the git repo and moving the *connectvalues.php* file into the home directory (issue each command below one by one)
+
+        cd ~
+
+        git clone -b loft https://github.com/mikegcoleman/todo-php
+
+        mv /home/ubuntu/todo-php/connectvalues.php .
 
 * Ensure the permissions on the file are correct (they need to be set to represent the container's user account)
 
+        sudo chown www-data:www-data /home/ubuntu/connectvalues.php 
+
 * Restart the container using the `-v` switch and the instruct Docker to remap the container's configuration file to the one on the local host. 
 
-        docker run -d -p 80:80 --name web -v ~/config.php:/var/www/html/config.php mikegcoleman/todo-php:reinvent
+        docker run -d -p 80:80 --name web -v ~/connectvalues.php:/var/www/html/connectvalues.php mikegcoleman/todo-php:reinvent
 
 * Follow the steps in the  *Attach the Lightsail database* section to specify the database connection information
 
@@ -213,13 +221,17 @@ The other way to handle the issue is to instruct Docker to remap the file from t
 
 * Now go ahead and stop the container, remove it, and restart it 
 
-    docker stop web
+        docker stop web
 
-    docker rm web
+        docker rm web
 
-    docker run -d -p 80:80 --name web -v ~/config.php:/var/www/html/config.php mikegcoleman/todo:reinvent
+        docker run -d -p 80:80 --name web -v ~/connectvalues.php:/var/www/html/connectvalues.php mikegcoleman/todo-php:reinvent
 
 * Reload the Todo website, and notice that this time after deleting and starting a new container the configuration information was persisted. 
+
+* If you look at the contents of the file on your host machine you can see it contains the connection values for your Lightsail database
+
+        cat /home/ubuntu/connectvalues.php
 
 
 
