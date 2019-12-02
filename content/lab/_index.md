@@ -112,7 +112,7 @@ For this session we'll be using a prepackaged Docker image as covering the proce
 
 * Issue the `docker run` command to start the web front end
 
-        docker run -d -p 80:80 --name web mikegcoleman/todo:reinvent
+        docker run -d -p 80:80 --name web mikegcoleman/todo-php:reinvent
         
     * *-d*  starts the container in the background (detached mode)
     * *-p* insructs Docker to route any connections coming into the Lightsail instance on port 80 to be routed to the docker container on the same port
@@ -168,6 +168,67 @@ The containerized web application is now saving the task data into the Lightsail
 {{% notice tip %}}
 Notice that the Database host displayed at the bottom of the screen matches the endpoint value for your Lightsail database.   
 {{% /notice %}}
+
+### Dealing with data persistence
+
+One of the issues with containers is that they are ephemeral, meaning that any data saved in the container is lost if the container is restarted. In the case of the Todo application it saves the information for the database connection in a file. 
+
+* Stop the running container 
+
+        docker stop web
+
+* Remove the running container
+
+        docker rm web
+
+* Restart the container
+
+        docker run -d -p 80:80 --name web mikegcoleman/todo-php:reinvent
+    
+* Go back to your web browser, and reload the Todo application. Notice that it once again cannot find the database connection. 
+
+There are a couple of ways of dealing with this issue. You could refactor the application to use environment variables, which can be passed when you start the container. You could also use a secrets manager to securely store the connection information. 
+
+The other way to handle the issue is to instruct Docker to remap the file from the container file system to the host's file system. With this approach, any information written to the file will persist even if the container is removed. 
+
+* Stop the running container 
+
+        docker stop web
+
+* Remove the running container
+
+        docker rm web
+
+* Create a local copy of the configuration file
+
+* Ensure the permissions on the file are correct (they need to be set to represent the container's user account)
+
+* Restart the container using the `-v` switch and the instruct Docker to remap the container's configuration file to the one on the local host. 
+
+        docker run -d -p 80:80 --name web -v ~/config.php:/var/www/html/config.php mikegcoleman/todo-php:reinvent
+
+* Follow the steps in the  *Attach the Lightsail database* section to specify the database connection information
+
+* Go back to the web browser and reload the site, notice that the data you entered previously is now being retrieved from the database
+
+* Now go ahead and stop the container, remove it, and restart it 
+
+    docker stop web
+
+    docker rm web
+
+    docker run -d -p 80:80 --name web -v ~/config.php:/var/www/html/config.php mikegcoleman/todo:reinvent
+
+* Reload the Todo website, and notice that this time after deleting and starting a new container the configuration information was persisted. 
+
+
+
+
+
+
+
+
+
 
 
 
